@@ -39,29 +39,29 @@ mongoose
   .then(() => console.log("Monogo with auth service is running"))
   .catch((error) => console.log("Error while connecting to atlas", error));
 
-  app.get('/payment-confirmation', async (req, res) => {
-    const { subscription, user, email, con, duration }  = req.query;
+app.get('/payment-confirmation', async (req, res) => {
+  const { subscription, user, email, con, duration }  = req.query;
 
-    updateUserSub(user, subscription, duration);
+  updateUserSub(user, subscription, duration);
 
-    const codes = await findCode(duration, con);
+  const codes = await findCode(duration, con);
 
-    if (codes.length <= 0) {
-      /**TODO:let user and admin know about missing codes*/
-      sendSubscriptionCodes(null);
-      console.log('whoops');
-    } else {
+  if (codes.length <= 0) {
+    /**TODO:let user and admin know about missing codes*/
+    sendSubscriptionCodes(null);
+    console.log('whoops');
+  } else {
 
-      for (const codeId of codes.map(code => code._id)) {
-        await updateCode(codeId, user);
-      }
-
-      let alertUser = codes.length < con;
-      await sendSubscriptionCodes(codes, email, duration);
+    for (const codeId of codes.map(code => code._id)) {
+      await updateCode(codeId, user);
     }
 
-    /**TODO: figure out how to replace confirmation page with the already built react component */
-    res.sendFile(path.join(__dirname, 'confirmationPage.html'));
-  });
+    let alertUser = codes.length < con;
+    await sendSubscriptionCodes(codes, email, duration);
+  }
+
+  /**TODO: figure out how to replace confirmation page with the already built react component */
+  res.sendFile(path.join(__dirname, 'confirmationPage.html'));
+});
 
 module.exports = app;

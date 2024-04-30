@@ -8,7 +8,7 @@
     "build-watch": "concurrently \"npx webpack --watch --mode development\" \"npm run sass\"",
     "build": "npx webpack",
     "dev": "nodemon server/index.js",
-    "start": "node src/server/index.js",
+    "start": "node server/index.js",
     "sass": "node-sass public/styles/main.scss public/styles/style.css -w"
   },
   "author": "",

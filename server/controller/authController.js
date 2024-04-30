@@ -24,7 +24,7 @@ exports.signupUser = async (req, res) => {
 
   const user = await User.findOne({ email: email });
   const username = await User.findOne({ userName: userName });
-console.log(user)
+
   /** TODO: FIX THIS LOGIC -- MODIFIED FOR TESTING */
   if (user && user.isVerified) return res.status(404).send({ message: "User already exists" });
   if (username && user.isVerified) return res.status(404).send({ message: "Username taken" });
