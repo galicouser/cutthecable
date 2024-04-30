@@ -1,0 +1,9 @@
+.total-price-container{
+  display: flex;
+  justify-content: center;
+}
+
+.edit-icon {
+  display: flex;
+  justify-content: center;
+}

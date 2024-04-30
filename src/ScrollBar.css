@@ -1,0 +1,18 @@
+/* Target the track and thumb elements of the scrollbar */
+::-webkit-scrollbar {
+    width: 8px; /* Set the width of the scrollbar */
+  }
+  
+  ::-webkit-scrollbar-track {
+    background-color:   #1c1f25; /* Set the background color of the scrollbar track */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: #f1f1f1;/* Set the color of the scrollbar thumb */
+    border-radius: 4px; /* Set the border radius of the scrollbar thumb */
+  }
+  
+  /* Optional: Hover style for the scrollbar thumb */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #f1f1f1;
+  }

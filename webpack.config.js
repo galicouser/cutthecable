@@ -21,6 +21,17 @@ module.exports = () => {
     module: {
       rules: [
         {
+          test: /\.(jpg|jpeg|png)$/,
+          use: {
+            loader: 'url-loader',
+            options: {
+              limit: 8192, // Limit for embedding as Data URL
+              name: '[name].[ext]',
+              outputPath: 'images/', // Output path for the processed file
+            },
+          },
+        },
+        {
           test: /\.(js|jsx)$/,
           exclude: '/node_modules/',
           use: {
