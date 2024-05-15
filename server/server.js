@@ -56,25 +56,26 @@ mongoose
 
         if (codes.length <= 0) {
           // TODO: Notify user and admin about missing codes
-          sendSubscriptionCodes(null);
-          console.log('No subscription codes available');
+          sendSubscriptionCodes(null, email);
+          return res.sendFile(path.join(__dirname, 'confirmationPage.html'));
         } else {
           // Update codes and send them to the user
           for (const codeId of codes.map(code => code._id)) {
             await updateCode(codeId, user);
           }
-          let alertUser = codes.length < con;
+
           await sendSubscriptionCodes(codes, email, duration);
 
-          res.sendFile(path.join(__dirname, 'confirmationPage.html'));
+          return res.sendFile(path.join(__dirname, 'confirmationPage.html'));
         }
       } else {
         console.error('Error capturing PayPal order:', captureResponse.statusText);
-        res.sendFile(path.join(__dirname, 'orderFailed.html'));
+        return res.sendFile(path.join(__dirname, 'orderFailed.html'));
       }
     } catch (error) {
       console.error('Error capturing PayPal order:', error);
       // Handle error
+      return res.sendFile(path.join(__dirname, 'orderFailed.html'));
     }
 
   // Send confirmation page
