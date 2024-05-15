@@ -40,30 +40,42 @@ mongoose
   .then(() => console.log("Monogo with auth service is running"))
   .catch((error) => console.log("Error while connecting to atlas", error));
 
-app.get('/payment-confirmation', async (req, res) => {
-  const { subscription, user, email, con, duration, price }  = req.query;
+  app.get('/payment-confirmation', async (req, res) => {
+    const { subscription, user, email, con, duration, price, token } = req.query;
 
-  createPurchase(user, duration, con, price);
+    try {
+      // Capture the PayPal order
+      const captureResponse = await capturePaypalOrder(token);
+      if (captureResponse.statusCode === 200) {
+        console.log('Payment captured successfully:', captureResponse.result);
 
-  updateUserSub(user, subscription, duration);
+        // Perform actions after successful payment capture
+        createPurchase(user, duration, con, price);
+        updateUserSub(user, subscription, duration);
+        const codes = await findCode(duration, con);
 
-  const codes = await findCode(duration, con);
-
-  if (codes.length <= 0) {
-    /**TODO:let user and admin know about missing codes*/
-    sendSubscriptionCodes(null);
-    console.log('whoops');
-  } else {
-
-    for (const codeId of codes.map(code => code._id)) {
-      await updateCode(codeId, user);
+        if (codes.length <= 0) {
+          // TODO: Notify user and admin about missing codes
+          sendSubscriptionCodes(null);
+          console.log('No subscription codes available');
+        } else {
+          // Update codes and send them to the user
+          for (const codeId of codes.map(code => code._id)) {
+            await updateCode(codeId, user);
+          }
+          let alertUser = codes.length < con;
+          await sendSubscriptionCodes(codes, email, duration);
+        }
+      } else {
+        console.error('Error capturing PayPal order:', captureResponse.statusText);
+        // Handle error
+      }
+    } catch (error) {
+      console.error('Error capturing PayPal order:', error);
+      // Handle error
     }
 
-    let alertUser = codes.length < con;
-    await sendSubscriptionCodes(codes, email, duration);
-  }
-
-  /**TODO: figure out how to replace confirmation page with the already built react component */
+  // Send confirmation page
   res.sendFile(path.join(__dirname, 'confirmationPage.html'));
 });
 

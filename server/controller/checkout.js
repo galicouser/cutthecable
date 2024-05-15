@@ -53,7 +53,7 @@ const createPaypalOrder = async (req, res) => {
 
     const subscriptionId = subscriptionPackage._id;
 
-    const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.LiveEnvironment(
+    const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.SandboxEnvironment(
       process.env.PP_CLIENT_ID,
       process.env.PP_CLIENT_SECRET
     ));
@@ -79,26 +79,46 @@ const createPaypalOrder = async (req, res) => {
 
     // Check if the order was successfully created
     if (order.statusCode === 201) {
-      // Redirect user to PayPal for payment
-      const captureOrderRequest = new paypal.orders.OrdersCaptureRequest(order.result.id);
-      captureOrderRequest.requestBody({});
+      const approveLink = order.result.links.find(link => link.rel === 'approve');
 
-      const captureResponse = await paypalClient.execute(captureOrderRequest);
-
-      if (captureResponse.statusCode === 201 || captureResponse.statusCode === 200) {
-        res.status(200).json({ message: 'Payment successful', order: captureResponse.result });
+      if (approveLink) {
+        return res.status(200).json({ redirectUrl: approveLink.href });
       } else {
-        console.error('Error capturing PayPal order:', captureResponse.statusText);
-        res.status(500).send('Error capturing PayPal order;')
+        console.error('Approval link not found in PayPal response');
+        return res.status(500).send('Error: Approval link not found');
       }
     } else {
-      // Handle error if the order creation failed
-      console.error('Error creating PayPal order:', order.statusText);
-      res.status(500).send('Error creating PayPal order');
+      console.error('Error creating PayPal order:', order);
+      return res.status(500).send('Error creating PayPal order');
     }
   } catch (error) {
     console.error('Error creating order:', error);
-    res.status(500).send('Error processing payment');
+    return res.status(500).send('Error processing payment');
+  }
+};
+
+const capturePaypalOrder = async (token) => {
+
+  try {
+    const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.LiveEnvironment(
+      process.env.PP_CLIENT_ID,
+      process.env.PP_CLIENT_SECRET
+    ));
+
+    const captureRequest = new paypal.orders.OrdersCaptureRequest(token);
+    captureRequest.requestBody({});
+
+    const captureResponse = await paypalClient.execute(captureRequest);
+
+    if (captureResponse.statusCode === 201 || captureResponse.statusCode === 200) {
+      return res.status(200).json({ message: 'Payment successful', order: captureResponse.result });
+    } else {
+      console.error('Error capturing PayPal order:', captureResponse);
+      return res.status(500).send('Error capturing PayPal order');
+    }
+  } catch (error) {
+    console.error('Error capturing order:', error);
+    return res.status(500).send('Error processing payment');
   }
 };
 
@@ -210,7 +230,7 @@ const createStripeOrder = async (req, res) => {
       mode: "payment",
       customer: customerId,
       success_url: `https://cutthecable.org/payment-confirmation?subscription=${subscriptionId.toString()}&user=${userId}&email=${email}&con=${connections}&duration=${duration}/checkout/payment-confirmed`,
-      cancel_url: `https://cutthecable.org/UserProfile`,
+      cancel_url: `https://cutthecable.org`,
     });
 
     res.send(session.url);
@@ -446,6 +466,7 @@ module.exports = {
   createStripeOrder,
   updateCode,
   findCode,
+  capturePaypalOrder,
   updateUserSub,
   createPurchase
 }
