@@ -70,8 +70,8 @@ const createPaypalOrder = async (req, res) => {
         }
       }],
       application_context: {
-        return_url: `https://cutthecable.org/payment-confirmation?subscription=${subscriptionId.toString()}&user=${userId}&email=${email}&con=${connections}&duration=${duration}`, // Replace with your actual return URL
-        cancel_url: 'https://cutthecable.org/UserProfile', // Replace with your actual cancel URL
+        return_url: `https://cutthecable.org/payment-confirmation?subscription=${subscriptionId.toString()}&user=${userId}&email=${email}&con=${connections}&duration=${duration}&price=${price}`, // Replace with your actual return URL
+        cancel_url: 'https://cutthecable.org/', // Replace with your actual cancel URL
       }
     });
 
@@ -80,14 +80,16 @@ const createPaypalOrder = async (req, res) => {
     // Check if the order was successfully created
     if (order.statusCode === 201) {
       // Redirect user to PayPal for payment
-      const approveLink = order.result.links.find(link => link.rel === 'approve');
-      if (approveLink) {
-        // Send the redirect URL back to the client
-        res.status(200).json({ redirectUrl: approveLink.href });
+      const captureOrderRequest = new paypal.orders.OrdersCaptureRequest(order.result.id);
+      captureOrderRequest.requestBody({});
+
+      const captureResponse = await paypalClient.execute(captureOrderRequest);
+
+      if (captureResponse.statusCode === 201 || captureResponse.statusCode === 200) {
+        res.status(200).json({ message: 'Payment successful', order: captureResponse.result });
       } else {
-        // If the approve link is not found, handle the error
-        console.error('Approval link not found in PayPal response');
-        res.status(500).send('Error: Approval link not found');
+        console.error('Error capturing PayPal order:', captureResponse.statusText);
+        res.status(500).send('Error capturing PayPal order;')
       }
     } else {
       // Handle error if the order creation failed

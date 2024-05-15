@@ -13,11 +13,12 @@ const checkoutRouter = require("./routes/checkout");
 const subscriptionPackage = require("./routes/subscriptionPackage");
 const codeRouter = require("./routes/code");
 const { updateCode, findCode } = require('./controller/codeController')
-const { updateUserSub } = require('./controller/checkout');
+const { updateUserSub, createPurchase } = require('./controller/checkout');
 
 const { sendSubscriptionCodes } = require('./utils/emailService');
 
-const uri = `mongodb+srv://${username}:${password}@nocablesneeded.ffgwwlu.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://${username}:${password}@nocablesneeded.ffgwwlu.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://admin:secret-lemur-test-1214@cutthecable-prod.r3qdzla.mongodb.net/?retryWrites=true&w=majority&appName=CutTheCable-Prod`
 
 const app = express();
 
@@ -40,7 +41,9 @@ mongoose
   .catch((error) => console.log("Error while connecting to atlas", error));
 
 app.get('/payment-confirmation', async (req, res) => {
-  const { subscription, user, email, con, duration }  = req.query;
+  const { subscription, user, email, con, duration, price }  = req.query;
+
+  createPurchase(user, duration, con, price);
 
   updateUserSub(user, subscription, duration);
 
