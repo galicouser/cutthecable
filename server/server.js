@@ -65,10 +65,12 @@ mongoose
           }
           let alertUser = codes.length < con;
           await sendSubscriptionCodes(codes, email, duration);
+
+          res.sendFile(path.join(__dirname, 'confirmationPage.html'));
         }
       } else {
         console.error('Error capturing PayPal order:', captureResponse.statusText);
-        // Handle error
+        res.sendFile(path.join(__dirname, 'orderFailed.html'));
       }
     } catch (error) {
       console.error('Error capturing PayPal order:', error);
@@ -76,7 +78,7 @@ mongoose
     }
 
   // Send confirmation page
-  res.sendFile(path.join(__dirname, 'confirmationPage.html'));
+
 });
 
 module.exports = app;
