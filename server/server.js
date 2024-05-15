@@ -13,7 +13,7 @@ const checkoutRouter = require("./routes/checkout");
 const subscriptionPackage = require("./routes/subscriptionPackage");
 const codeRouter = require("./routes/code");
 const { updateCode, findCode } = require('./controller/codeController')
-const { updateUserSub, createPurchase } = require('./controller/checkout');
+const { updateUserSub, createPurchase, capturePaypalOrder } = require('./controller/checkout');
 
 const { sendSubscriptionCodes } = require('./utils/emailService');
 

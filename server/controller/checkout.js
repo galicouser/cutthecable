@@ -98,7 +98,6 @@ const createPaypalOrder = async (req, res) => {
 };
 
 const capturePaypalOrder = async (token) => {
-
   try {
     const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.LiveEnvironment(
       process.env.PP_CLIENT_ID,
@@ -111,16 +110,19 @@ const capturePaypalOrder = async (token) => {
     const captureResponse = await paypalClient.execute(captureRequest);
 
     if (captureResponse.statusCode === 201 || captureResponse.statusCode === 200) {
-      return res.status(200).json({ message: 'Payment successful', order: captureResponse.result });
+      return { result: captureResponse.result, statusCode: 200 };
     } else {
-      console.error('Error capturing PayPal order:', captureResponse);
-      return res.status(500).send('Error capturing PayPal order');
+      console.error('Error capturing PayPal order - Status:', captureResponse.statusCode);
+      console.error('Error capturing PayPal order - Response:', captureResponse.result);
+      return { error: 'Capture failed with status ' + captureResponse.statusCode };
     }
   } catch (error) {
     console.error('Error capturing order:', error);
-    return res.status(500).send('Error processing payment');
+    return { error: error.message || 'Unknown error occurred' };
   }
 };
+
+
 
 const fetchSubscriptionPackage = async (duration, connections) => {
   try {
