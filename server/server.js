@@ -41,7 +41,7 @@ mongoose
   .catch((error) => console.log("Error while connecting to atlas", error));
 
   app.get('/payment-confirmation', async (req, res) => {
-    const { subscription, user, email, con, duration, price, token } = req.query;
+    const { subscription, user, email, con, duration, price, token, payerID } = req.query;
 
     try {
       // Capture the PayPal order
@@ -50,7 +50,7 @@ mongoose
         console.log('Payment captured successfully:', captureResponse.result);
 
         // Perform actions after successful payment capture
-        createPurchase(user, duration, con, price);
+        createPurchase(user, duration, con, price, payerID);
         updateUserSub(user, subscription, duration);
         const codes = await findCode(duration, con);
 
