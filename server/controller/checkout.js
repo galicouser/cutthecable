@@ -53,7 +53,7 @@ const createPaypalOrder = async (req, res) => {
 
     const subscriptionId = subscriptionPackage._id;
 
-    const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.LiveEnvironment(
+    const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.SandboxEnvironment(
       process.env.PP_CLIENT_ID,
       process.env.PP_CLIENT_SECRET
     ));
@@ -99,7 +99,7 @@ const createPaypalOrder = async (req, res) => {
 
 const capturePaypalOrder = async (token) => {
   try {
-    const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.LiveEnvironment(
+    const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.SandboxEnvironment(
       process.env.PP_CLIENT_ID,
       process.env.PP_CLIENT_SECRET
     ));
