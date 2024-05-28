@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from "styled-components";
 import MultipleCard from "./MultipleCard";
 
@@ -28,15 +29,15 @@ background-color: #f9f9f9;
     margin-top:4%;
 }
 @media (max-width: 767px) {
-   
-    
+
+
     .TitleText{
         font-size:50px;
         color: #1c1f25;
         padding:0px;
         padding-left:0px;
         text-align:center;
-    } 
+    }
     .CardsDisplay{
         padding-left:0px;
     }

@@ -51,15 +51,6 @@ const SideBar = ({ updateParentValue }) => {
   }
 
 
-  function RedeemCodePressed() {
-    updateParentValue(4);
-    setWatchHistory(false);
-    setChangePlan(false);
-    setUpdateProfile(false);
-    setRedeemCode(Troubleshoot);
-    setMenuData(!ShowMenuData);
-  }
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       const menuDisplay = document.querySelector('.MenuDisplay');
@@ -114,9 +105,7 @@ const SideBar = ({ updateParentValue }) => {
           <div className="Option" onClick={UpdateProfilePressed}>
             <p className="OptionText">Update Profile</p>
           </div>
-          <div className="Option" onClick={RedeemCodePressed}>
-            <p className="OptionText">Redeem Code</p>
-          </div>
+
         </div>
       </div>
       <MoreHorizIcon className="menuIcon" onClick={MenuIconClicked}></MoreHorizIcon>
@@ -127,7 +116,6 @@ const SideBar = ({ updateParentValue }) => {
           {/* <p className="ButtonText" onClick={WatchHistoryPressed}>Watch History</p> */}
           <p className="ButtonText" onClick={ChangePlanPressed}>Subscriptions</p>
           <p className="ButtonText" onClick={UpdateProfilePressed}>Update Profile</p>
-          <p className="ButtonText" onClick={RedeemCodePressed}>Redeem Code</p>
         </div>
       )}
     </Wrapper>
@@ -142,8 +130,8 @@ const Wrapper = styled.section`
   align-content: center;
   border-right: 1px solid rgb(0,0,0,0.1);
   width: 300px;
-  
-  
+
+
   .UserImage {
     height: 150px;
     width: 150px;
@@ -179,7 +167,7 @@ const Wrapper = styled.section`
     cursor: pointer;
   }
   .MenuDisplay{
-    display:none;    
+    display:none;
   }
   @media (max-width: 767px) {
     height: 0px;
@@ -187,7 +175,7 @@ const Wrapper = styled.section`
     .SideBarMainDiv {
       display: none;
     }
-    
+
     .menuIcon {
       display: flex;
       color: #1c1f25;
@@ -202,7 +190,7 @@ const Wrapper = styled.section`
       left:10px;
       top:150px;
       background-color: white;
-      
+
       display: flex;
       flex-direction: column;
       align-items: Center;
@@ -210,7 +198,7 @@ const Wrapper = styled.section`
       background-color:#C01D2F;
       border-radius:10px;
       z-index:15;
-      
+
     }
     .ButtonText{
       font-size:20px;
@@ -224,7 +212,7 @@ const Wrapper = styled.section`
     width:45%;
     padding-right: 0%;
     margin-top:15%;
-   
+
   }
 `;
 export default SideBar;

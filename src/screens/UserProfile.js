@@ -11,7 +11,7 @@ import UpdateProfile from "../components/UpdateProfile";
 import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
-  const [CurrentScreen, setCurrentScreen] = useState(4);
+  const [CurrentScreen, setCurrentScreen] = useState(3);
   const [SignInPrompt, setSignInPrompt] = useState(true);
   const [ReferralOverlay, setReferralOverlay] = useState();
   const isVerified = localStorage.getItem("isVerified");
@@ -50,16 +50,6 @@ const UserProfile = () => {
     if (CurrentScreen === 3) {
       return <UpdateProfile />;
     }
-    if (CurrentScreen === 4) {
-      return (
-        <RedeemCode />
-
-      )
-
-      ;
-    }
-
-
 
   }
   const backgroundChange = () => {
