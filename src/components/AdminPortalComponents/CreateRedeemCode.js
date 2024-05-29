@@ -65,9 +65,14 @@ const CreateRedeemCode = () => {
     const code = subscriptionCode;
 
     const response = await createCode(code, duration);
-    console.log(response);
 
-    setRedeemCode('');
+    if (response === undefined) {
+      alert('Cannot add duplicate code');
+    } else {
+      alert('Prepay code added');
+    }
+
+    setSubscriptionCode('');
     setIsLoading(false);
   }
 
