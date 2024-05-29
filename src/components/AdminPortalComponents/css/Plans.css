@@ -7,3 +7,7 @@
   display: flex;
   justify-content: center;
 }
+
+.admin-plans-container {
+  padding: 75px;
+}
