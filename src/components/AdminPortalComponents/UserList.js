@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { adminPostedCodes, deleteRedeemCode, getCodes } from "../../APIs/redeemAPI";
+import { fetchusers } from "../../APIs/authAPI";
 import { Button } from '@mui/material';
 import '@mui/material/styles';
 
@@ -12,14 +13,17 @@ const UserList = () => {
   const [data, setData] = useState([]);
   const [err, setErr] = useState(false);
   const [update, setUpdate] = useState(0);
+  const [users, setUsers] = useState([]);
 
   const fetchData = async () => {
-    const codes = await getCodes();
+    let codes = await getCodes();
     // Generate unique IDs for each row
     // if (!codes) return;
-
     const rowsWithIds = codes.data.data.map((row, index) => ({ ...row, id: row._id }));
     setData(rowsWithIds);
+
+    const userData = await fetchusers();
+    setUsers(userData.data.data);
   }
 
   useEffect(() => {
@@ -35,10 +39,26 @@ const UserList = () => {
     await deleteRedeemCode(rowData._id, fetchData);
   };
 
+  const updateData = data.map(field => {
+    const user = users.find(user => user.id === field.assignee);
+    if (user) {
+        return {
+            ...field,
+            username: user.name,
+            email: user.email
+        };
+    }
+    return field; // If no matching user is found, return the field as is.
+});
+
+  const rowsWithIds = updateData.map((row, index) => ({ ...row, id: row._id }));
+  // setData(rowsWithIds);
+
   const columns = [
     { field: "code", headerName: "Prepay Code", width: 200 },
     { field: "duration", headerName: "Plan Length", width: 200 },
-    { field: "assignee", headerName: "Assigned To", width: 200 },
+    { field: "username", headerName: "Assigned To: (username)", width: 200 },
+    { field: "email", headerName: "Assigned To: (email)", width: 200 },
     {
       field: "activated",
       headerName: "Status",
@@ -109,7 +129,7 @@ const UserList = () => {
         ) : (
           <div className="table">
             <DataGrid
-              rows={data}
+              rows={rowsWithIds}
               columns={columns.map((column) => ({
                 ...column,
               }))}

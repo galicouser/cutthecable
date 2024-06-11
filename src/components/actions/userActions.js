@@ -11,7 +11,7 @@ export const fetchAllUsers = () => async (dispatch) => {
     }
 
     const { data } = response.data;
-    console.
+    console.log(data)
     dispatch({ type: 'FETCH_ALL_USERS', payload: data });
   } catch (error) {
     dispatch({ type: 'FETCH_SUBSCRIPTION_PLANS_FAILURE', payload: error.message })

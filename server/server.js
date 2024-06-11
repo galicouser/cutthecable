@@ -17,8 +17,8 @@ const { updateUserSub, createPurchase, capturePaypalOrder } = require('./control
 
 const { sendSubscriptionCodes } = require('./utils/emailService');
 
-// const uri = `mongodb+srv://${username}:${password}@nocablesneeded.ffgwwlu.mongodb.net/?retryWrites=true&w=majority`;
-const uri = `mongodb+srv://${username}:${password}@cutthecable-prod.r3qdzla.mongodb.net/?retryWrites=true&w=majority&appName=CutTheCable-Prod`
+const uri = `mongodb+srv://${username}:${password}@nocablesneeded.ffgwwlu.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://${username}:${password}@cutthecable-prod.r3qdzla.mongodb.net/?retryWrites=true&w=majority&appName=CutTheCable-Prod`
 
 const app = express();
 

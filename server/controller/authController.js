@@ -56,7 +56,7 @@ exports.FetchUsers = async (req, res) => {
   try {
     // Exclude users with email "admin@galico.io" from the query
     const users = await User.find({ email: { $ne: "admin@galico.io" } });
-    console.log(users)
+
     if (users.length === 0) {
       return res.status(200).send({ message: 'No entries found' });
     }
@@ -242,3 +242,19 @@ exports.resetPassword = async (req, res) => {
     return res.status(400).send({ message: "password not changed" });
   }
 };
+
+// exports.fetchAllUsers = async (req, res) => {
+//   try {
+//     // Exclude users with email "admin@galico.io" from the query
+//     const users = await User.find();
+
+//     if (users.length === 0) {
+//       return res.status(200).send({ message: 'No entries found' });
+//     }
+
+//     console.log('USERSSS' + users);
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).send({ message: 'Internal Server Error' });
+//   }
+// }
