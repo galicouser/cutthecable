@@ -3,29 +3,40 @@ const User = require('./user.js');
 const SubscriptionPackage = require('./subscriptionPackage.js');
 
 const purchaseHistorySchema = new mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  order_id: {
+  userID: {
     type: String,
-    required: true
-  },
-  subscription_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'SubscriptionPackage',
-    required: true
-  },
-  total_cost: {
-    type: Number,
-    required: true
-  },
-  payment_status: {
-    type: String,
-    enum: ['authorized', 'captured', 'refunded'],
     required: true,
-  }
+  },
+  purchaseDate: {
+    type: Date,
+    default: Date.now,
+    required: true
+  },
+  itemPrice: {
+    type: String,
+    required: false,
+  },
+  quantity: {
+    type: Number,
+    required: false,
+  },
+  itemID: {
+    type: String,
+    required: false,
+  },
+  validity: {
+    type: String,
+    required: false,
+  },
+  checkoutID: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ['success', 'fail'],
+    required: true,
+  },
 });
 
 const PurchaseHistory = mongoose.model('PurchaseHistory', purchaseHistorySchema);

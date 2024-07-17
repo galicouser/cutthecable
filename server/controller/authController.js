@@ -26,8 +26,11 @@ exports.signupUser = async (req, res) => {
   const username = await User.findOne({ userName: userName });
 
   /** TODO: FIX THIS LOGIC -- MODIFIED FOR TESTING */
-  if (user && user.isVerified) return res.status(404).send({ message: "User already exists" });
-  if (username && user.isVerified) return res.status(404).send({ message: "Username taken" });
+  // if (user && user.isVerified) return res.status(404).send({ message: "User already exists" });
+  // if (username && user.isVerified) return res.status(404).send({ message: "Username taken" });
+
+  if (user) return res.status(404).send({ message: "User already exists" });
+  if (username) return res.status(404).send({ message: "Username taken" });
 
   const salt = await bcrypt.genSalt(12);
   const hashedPassword = await bcrypt.hash(password, salt);

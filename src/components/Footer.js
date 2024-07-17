@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import Grid from "@mui/material/Grid";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import YouTubeIcon from "@mui/icons-material/YouTube";
-import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import { FaTwitter, FaFacebook, FaYoutube, FaMusic, FaFacebookMessenger, FaTiktok } from 'react-icons/fa';
 import SwipeUpAltIcon from "@mui/icons-material/SwipeUpAlt";
+
 import axios from 'axios';
 function Footer() {
   const [showOverlay, setShowOverlay] = useState(false);
@@ -126,12 +124,11 @@ function Footer() {
             <Grid  item  sm={3}>
               <div className="gridItem2">
                 <p className="LoverGridText1" style={{ opacity: 0 }}></p>
-
                 <div className="CenteringDiv2">
-                  <TwitterIcon onClick={() => window.open('https://twitter.com/@slick_nsavvy', '_blank')} className="FooterIcon" />
-                  <FacebookIcon onClick={() => window.open('https://tinyurl.com/Cut-The-Cable', '_blank')}  className="FooterIcon" />
-                  <YouTubeIcon className="FooterIcon" />
-                  <MusicNoteIcon className="FooterIcon" />
+                  <FaTwitter onClick={() => window.open('https://twitter.com/@slick_nsavvy', '_blank')} className="FooterIcon" />
+                  <FaFacebook onClick={() => window.open('https://tinyurl.com/Cut-The-Cable', '_blank')}  className="FooterIcon" />
+                  <FaFacebookMessenger onClick={() => window.open('https://www.messenger.com/t/102122609600338', '_blank')} className="FooterIcon"/>
+                  <FaTiktok onClick={() => window.open('https://www.tiktok.com/@cutcable50', '_blank')} className="FooterIcon"/>
                 </div>
               </div>
             </Grid>
@@ -247,7 +244,13 @@ const Wrapper = styled.section`
   @media (max-width: 767px) {
     height: 100%;
     .CenteringDiv2 {
-      display: none;
+      display: flex;
+      flex-direction:row;
+      flex-wrap:wrap:
+      width: 325px;
+      justify-content: space-between;
+      align-items: center;
+      margin:28px;
     }
     .ToTopDiv {
       display: none;

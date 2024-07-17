@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import { adminPostedCodes, deleteRedeemCode, getCodes } from "../../APIs/redeemAPI";
+import { adminPostedCodes, deleteRedeemCode,updateRedeemCode, getCodes } from "../../APIs/redeemAPI";
 import { fetchusers } from "../../APIs/authAPI";
 import { Button } from '@mui/material';
 import '@mui/material/styles';
@@ -37,6 +37,10 @@ const UserList = () => {
 
   const handleButtonClick = async (rowData) => {
     await deleteRedeemCode(rowData._id, fetchData);
+  };
+
+  const UpdateRedeemCode = async (rowData) => {
+    await updateRedeemCode(rowData._id,rowData.assignee,'release', fetchData);
   };
 
   const updateData = data.map(field => {
@@ -76,15 +80,33 @@ const UserList = () => {
       headerName: "Actions",
       width: 150,
       renderCell: (params) => {
+        const customButtonStyle = {
+          padding: '8px 19px',
+          fontSize: '12px',
+          marginRight: '8px', // Add margin to create a gap between buttons
+        };
         return (
-          <Button
-          variant="contained"
-          color="primary"
-          disabled={params.row.activated === true}
-            onClick={() => handleButtonClick(params.row)}
-          >
-            Delete
-          </Button>
+          <>
+            {params.row.activated === true ? (
+            <Button
+              variant="contained"
+              color="primary"
+              style={customButtonStyle}
+              onClick={() => UpdateRedeemCode(params.row)}
+            >
+              Unassign
+            </Button>
+            ) : ( 
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={params.row.activated === true}
+              onClick={() => handleButtonClick(params.row)}
+            >
+              Delete
+            </Button>
+            )}
+          </>
         );
       },
     },

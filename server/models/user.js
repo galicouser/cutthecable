@@ -38,7 +38,8 @@ const userSchema = new mongoose.Schema({
     },
     purchaseDate: Date,
     endDate: Date
-  }
+  },
+  creation_date: { type: Date, default: Date.now }
 });
 
 const User = mongoose.model("User", userSchema);

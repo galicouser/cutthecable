@@ -6,7 +6,7 @@ const checkoutController = require("../controller/checkout");
 // //const emailService = require("../utils/emailService");
 
 // checkoutrouter.post("/process", checkoutontroller.stripeOrder);
-// checkoutrouter.get("/success", checkoutontroller.success);
+checkoutRouter.get("/success", checkoutController.success);
 // checkoutrouter.get("/success_paypal", checkoutontroller.success_paypal);
 // checkoutrouter.get("/failure", checkoutontroller.failure);
 // checkoutrouter.post('/create_order', checkoutontroller.createOrder);

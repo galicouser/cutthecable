@@ -142,6 +142,14 @@ function Header({ isLoggedIn }) {
 
         }
       </AnimatePresence>
+      {/* Facebook Messenger Chat Plugin */}
+      {/* <div class="fb-messengermessageus" 
+        messenger_app_id="<APP_ID>" 
+        page_id="<PAGE_ID>"
+        color="<blue | white>"
+        ref="<PASS_THROUGH_PARAM>" 
+        size="<standard | large | xlarge>">
+      </div> */}
     </Wrapper>
   );
 }

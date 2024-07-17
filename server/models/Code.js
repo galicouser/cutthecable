@@ -19,7 +19,12 @@ const codeSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     default: null
-  }
+  },
+  expired: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
 });
 
 const Code = mongoose.model('Code', codeSchema);

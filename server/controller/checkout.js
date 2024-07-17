@@ -17,14 +17,14 @@ const Checkout  = require("../models/checkout");
 const Code = require("../models/Code");
 const Purchase = require("../models/Purchase");
 const SubscriptionPackage  = require("../models/subscriptionPackage");
-// const RedeemCode = require('../models/redeem');
+const RedeemCode = require('../models/redeem');
 
 // // Comment out the validation imports if you want to remove validation temporarily
 // const {
 //     validateFields
 //   } = require("../middleware/checkout");
 
-// const { sendEmails } = require("../utils/emailService");
+const { sendEmails } = require("../utils/emailService");
 
 
 const paypal = require('@paypal/checkout-server-sdk');
@@ -54,8 +54,8 @@ const createPaypalOrder = async (req, res) => {
     const subscriptionId = subscriptionPackage._id;
 
     const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.SandboxEnvironment(
-      process.env.PP_CLIENT_ID,
-      process.env.PP_CLIENT_SECRET
+      process.env.PCLIENT_KEY,
+      process.env.PCLIENT_SECRET
     ));
 
     // Create order using PayPal API
@@ -70,8 +70,8 @@ const createPaypalOrder = async (req, res) => {
         }
       }],
       application_context: {
-        return_url: `https://cutthecable.org/payment-confirmation?subscription=${subscriptionId.toString()}&user=${userId}&email=${email}&con=${connections}&duration=${duration}&price=${price}`, // Replace with your actual return URL
-        cancel_url: 'https://cutthecable.org/', // Replace with your actual cancel URL
+        return_url: `${process.env.FRONTEND_URL}payment-confirmation?pg=paypal&subscription=${subscriptionId.toString()}&user=${userId}&email=${email}&con=${connections}&duration=${duration}&price=${price}`, // Replace with your actual return URL
+        cancel_url: `${process.env.FRONTEND_URL}`, // Replace with your actual cancel URL
       }
     });
 
@@ -100,8 +100,8 @@ const createPaypalOrder = async (req, res) => {
 const capturePaypalOrder = async (token) => {
   try {
     const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.SandboxEnvironment(
-      process.env.PP_CLIENT_ID,
-      process.env.PP_CLIENT_SECRET
+      process.env.PCLIENT_KEY,
+      process.env.PCLIENT_SECRET
     ));
 
     const captureRequest = new paypal.orders.OrdersCaptureRequest(token);
@@ -207,7 +207,9 @@ const createStripeOrder = async (req, res) => {
       customerId = customer.id;
     }
 
-    // Prepare line items for the Checkout Session
+    
+    
+    //Prepare line items for the Checkout Session
     const line_items = [{
 
         price_data: {
@@ -221,9 +223,9 @@ const createStripeOrder = async (req, res) => {
         quantity: 1
       }];
 
-
     // Create a Checkout Session
     const session = await stripe.checkout.sessions.create({
+      
       payment_method_types: ["card"],
       phone_number_collection: {
         enabled: false,
@@ -231,10 +233,9 @@ const createStripeOrder = async (req, res) => {
       line_items,
       mode: "payment",
       customer: customerId,
-      success_url: `https://cutthecable.org/payment-confirmation?subscription=${subscriptionId.toString()}&user=${userId}&email=${email}&con=${connections}&duration=${duration}/checkout/payment-confirmed`,
-      cancel_url: `https://cutthecable.org`,
+      success_url: `${process.env.CLIENT_URL}payment-confirmation?pg=stripe&session_id={CHECKOUT_SESSION_ID}&subscription=${subscriptionId.toString()}&user=${userId}&email=${email}&con=${connections}&duration=${duration}&price=${price}`,
+      cancel_url: `${process.env.CLIENT_URL}/UserProfile`,
     });
-
     res.send(session.url);
   } catch (error) {
     console.error("Error:", error);
@@ -244,6 +245,8 @@ const createStripeOrder = async (req, res) => {
 
 const success = async (req, res) => {
   const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+  // const capturepayment = await stripe.paymentIntents.capture(session.payment_intent);
+  // console.log(session);
   const session_items = await stripe.checkout.sessions.listLineItems(req.query.session_id);
   // console.log(session_items.data[0].description);
   // Split the output into lines
@@ -253,26 +256,20 @@ const success = async (req, res) => {
   let validity = null;
   let planId = null;
 
-  lines.forEach(line => {
-    if (line.startsWith('Validity:')) {
-      // Extract the "Validity" number (assuming it's always a number followed by " months")
-      validity = parseInt(line.match(/\d+/)[0]);
-    } else if (line.startsWith('Plan ID:')) {
-      // Extract the "Plan ID" (assuming it's the value after "Plan ID:")
-      planId = line.split('Plan ID: ')[1];
-    }
-  });
+  // lines.forEach(line => {
+  //   if (line.startsWith('Validity:')) {
+  //     // Extract the "Validity" number (assuming it's always a number followed by " months")
+  //     validity = parseInt(line.match(/\d+/)[0]);
+  //   } else if (line.startsWith('Plan ID:')) {
+  //     // Extract the "Plan ID" (assuming it's the value after "Plan ID:")
+  //     planId = line.split('Plan ID: ')[1];
+  //   }
+  // });
 
 
   // console.log(session);
   const email = session.customer_details.email;
   const admin_email = process.env.ADMIN_EMAIL;
-
-  const redeemcode = await RedeemCode.findOne({
-    status: 'Pending',
-    itemID: planId,
-    validity: validity,
-  });
 
   const checkouthistory = new Checkout({
     userID: email,
@@ -283,7 +280,6 @@ const success = async (req, res) => {
     status: 'success'
   });
   await checkouthistory.save();
-  if (redeemcode) {
     const newSubscription = new Subscription({
       user: email,
       subscription_code: redeemcode.code
@@ -295,7 +291,7 @@ const success = async (req, res) => {
       const updateredeem = await redeemcode.save();
       const subject = 'NCN subscription'
       const message = 'Thank you for purchasing! To redeem your subscription, please log into portal, goto subscription section and click on redeem subscription button';
-      await sendEmails(email,admin_email,message,subject);
+      // await sendEmails(email,admin_email,message,subject);
 
       console.log("Thank you for purchasing! To redeem your subscription, please log into portal, goto subscription section and click on redeem subscription button");
       // return res.status(200).send({ message: "Subscription purchased" });
@@ -305,19 +301,12 @@ const success = async (req, res) => {
     } catch (err) {
       const subject = 'NCN subscription'
       const message = 'Something went wrong during subscription purchase we are looking into it';
-      await sendEmails(email,admin_email,message,subject);
+      // await sendEmails(email,admin_email,message,subject);
 
       console.log("something went wrong",err);
-      res.redirect(`${process.env.FRONTEND_URL}/FailedPayment`);
+      // res.redirect(`${process.env.FRONTEND_URL}FailedPayment`);
       // return res.status(400).send({ message: "something went wrong" });
     }
-  } else {
-    const subject = 'NCN subscription'
-    const message = 'Subscription purchased but no redeemable code availale please contact admin';
-    await sendEmails(email,admin_email,message,subject);
-    res.redirect(`${process.env.FRONTEND_URL}/FailedPayment`);
-    // return res.status(404).send({ message: "Subscription purchased but no redeemable code availale please contact admin" });
-  }
 
     // try {
     //   const savedRedeemCode = await newRedeemCode.save();
@@ -362,7 +351,7 @@ const success_paypal = async (req, res) => {
             validity: validity,
           });
 
-          console.log(redeemcode);
+          // console.log(redeemcode);
 
             const checkouthistory = new Checkout({
               userID: email,
@@ -451,7 +440,6 @@ const createPurchase = async (user, duration, connections, price, payerID) => {
       duration,
       connections,
       total_cost: price,
-      payerID,
       purchase_date: new Date()
     });
 
@@ -471,7 +459,8 @@ module.exports = {
   findCode,
   capturePaypalOrder,
   updateUserSub,
-  createPurchase
+  createPurchase,
+  success
 }
 
 

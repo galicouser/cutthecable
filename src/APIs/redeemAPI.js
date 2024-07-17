@@ -3,8 +3,8 @@ import axios from "axios";
 const axiosAPI = axios.create({
     //baseURL: "https://nocableneeded-auth.onrender.com/",
     // baseURL: "1738api.cutthecable.org",
-    baseURL: "https://1738api.cutthecable.org",
-    // baseURL: "http://localhost:4242"
+    //baseURL: "https://1738api.cutthecable.org",
+    baseURL: "http://localhost:4242"
     // baseURL: "https://ctc-test-be.netlify.app"
 });
 
@@ -50,12 +50,13 @@ export const adminPostedCodes = async (email) => {
 
 export const userSubscriptionCodes = async (email) => {
     try {
-        return await axios.post("/redeem/getusersubscription", {
-            email: email
+        return await axiosAPI.post("/codes/getusersubscription", {
+           "email":email
         });
     } catch (err) {
         console.log("Error signing up", err);
     }
+
 };
 
 export const redeemValidityProductCount = async (item_id, validity) => {
@@ -98,3 +99,20 @@ export const deleteRedeemCode = async (id, callback) => {
       console.log("Error deleting redeem code", err);
     }
   };
+
+  // Function to update a redeem code
+  export const updateRedeemCode = async (id,userId, action,callback) => {
+    try {
+        const response = await axios.post("/codes/update-code", {
+            "id":id,
+            "userId":userId,
+            "action":action,
+        });
+        if (response.status === 200) {
+            callback();
+          }
+          return response;
+    } catch (err) {
+        console.log("Error deleting redeem code", err);
+    }
+};
