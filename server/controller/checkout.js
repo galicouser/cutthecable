@@ -52,11 +52,19 @@ const createPaypalOrder = async (req, res) => {
     const subscriptionPackage = await fetchSubscriptionPackage(duration, connections);
 
     const subscriptionId = subscriptionPackage._id;
+    let paypalClient;
+    if (process.env.PMODE === 'live') {
+        paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.LiveEnvironment(
+        process.env.PCLIENT_KEY,
+        process.env.PCLIENT_SECRET
+      ));
+    } else {
+        paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.SandboxEnvironment(
+        process.env.PCLIENT_KEY,
+        process.env.PCLIENT_SECRET
+      ));
+    }
 
-    const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.SandboxEnvironment(
-      process.env.PCLIENT_KEY,
-      process.env.PCLIENT_SECRET
-    ));
 
     // Create order using PayPal API
     const request = new paypal.orders.OrdersCreateRequest();
@@ -99,10 +107,18 @@ const createPaypalOrder = async (req, res) => {
 
 const capturePaypalOrder = async (token) => {
   try {
-    const paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.SandboxEnvironment(
-      process.env.PCLIENT_KEY,
-      process.env.PCLIENT_SECRET
-    ));
+    let paypalClient;
+    if (process.env.PMODE === 'live') {
+        paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.LiveEnvironment(
+        process.env.PCLIENT_KEY,
+        process.env.PCLIENT_SECRET
+      ));
+    } else {
+        paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.SandboxEnvironment(
+        process.env.PCLIENT_KEY,
+        process.env.PCLIENT_SECRET
+      ));
+    }
 
     const captureRequest = new paypal.orders.OrdersCaptureRequest(token);
     captureRequest.requestBody({});
