@@ -101,7 +101,7 @@ const createPaypalOrder = async (req, res) => {
     }
   } catch (error) {
     console.error('Error creating order:', error);
-    return res.status(500).send('Error processing payment');
+    return res.status(500).send(error);
   }
 };
 
