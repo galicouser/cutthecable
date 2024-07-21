@@ -53,6 +53,7 @@ const createPaypalOrder = async (req, res) => {
 
     const subscriptionId = subscriptionPackage._id;
     let paypalClient;
+    console.log(process.env.PMODE);
     if (process.env.PMODE === 'live') {
         paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.LiveEnvironment(
         process.env.PCLIENT_KEY,
@@ -64,6 +65,7 @@ const createPaypalOrder = async (req, res) => {
         process.env.PCLIENT_SECRET
       ));
     }
+    console.log(paypalClient);
 
 
     // Create order using PayPal API
@@ -107,7 +109,9 @@ const createPaypalOrder = async (req, res) => {
 
 const capturePaypalOrder = async (token) => {
   try {
+
     let paypalClient;
+    console.log(process.env.PMODE);
     if (process.env.PMODE === 'live') {
         paypalClient = new paypal.core.PayPalHttpClient(new paypal.core.LiveEnvironment(
         process.env.PCLIENT_KEY,
@@ -119,6 +123,7 @@ const capturePaypalOrder = async (token) => {
         process.env.PCLIENT_SECRET
       ));
     }
+    console.log(paypalClient);
 
     const captureRequest = new paypal.orders.OrdersCaptureRequest(token);
     captureRequest.requestBody({});
