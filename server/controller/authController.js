@@ -58,7 +58,11 @@ exports.signupUser = async (req, res) => {
 exports.FetchUsers = async (req, res) => {
   try {
     // Exclude users with email "admin@galico.io" from the query
-    const users = await User.find({ email: { $ne: "admin@galico.io" } });
+    const users = await User.find({ 
+      email: { $ne: "admin@galico.io" }, 
+      deleted: false 
+    });
+    
 
     if (users.length === 0) {
       return res.status(200).send({ message: 'No entries found' });

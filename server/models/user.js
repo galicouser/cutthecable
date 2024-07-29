@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  deleted: {
+    type: Boolean,
+    default: false,
+  },
   subscription: {
     package: {
       type: mongoose.Schema.Types.ObjectId,
