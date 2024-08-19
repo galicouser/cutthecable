@@ -18,7 +18,7 @@ const { updateCode,updateUserSub, createPurchase, capturePaypalOrder } = require
 
 const { sendSubscriptionCodes } = require('./utils/emailService');
 
-const uri = `mongodb+srv://${username}:${password}@${db_endpoint}/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${username}:${password}@${db_endpoint}/`;
 // const uri = `mongodb+srv://${username}:${password}@cutthecable-prod.r3qdzla.mongodb.net/?retryWrites=true&w=majority&appName=CutTheCable-Prod`
 const paths = [
   '/',
