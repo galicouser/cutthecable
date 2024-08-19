@@ -138,9 +138,10 @@ exports.loginUser = async (req, res) => {
 
   let user = await User.findOne({
     userName: userName,
-    deleted: false || null,
-    isVerified : true,
+    deleted: { $in: [false, null] },
+    isVerified: true,
   });
+  
   console.log(user)
   if (!user) return res.status(404).send({ message: "Account not found" });
   console.log(user)
