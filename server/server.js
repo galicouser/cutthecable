@@ -59,7 +59,7 @@ app.use('/subscriptionPackages', subscriptionPackage);
 app.use('/codes', codeRouter);
 
 mongoose
-  .connect(uri, { useNewUrlParser: true }, { useUnifiedTopology: true })
+  .connect(uri)
   .then(() => {
     console.log("MongoDB with auth service is running");
     const db = mongoose.connection.db;
