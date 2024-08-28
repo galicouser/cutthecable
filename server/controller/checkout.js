@@ -247,7 +247,7 @@ const createStripeOrder = async (req, res) => {
     // Create a Checkout Session
     const session = await stripe.checkout.sessions.create({
       
-      payment_method_types: ['card', 'google_pay', 'apple_pay','cashapp'],
+      payment_method_types: ['card','cashapp'],
       phone_number_collection: {
         enabled: false,
       },
