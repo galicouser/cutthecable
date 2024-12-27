@@ -58,6 +58,33 @@ export const userSubscriptionCodes = async (email) => {
     }
 
 };
+//get user subscription by code
+export const getUserSubCode = async (email, code) => {
+    try {
+        const response = await axios.post("/codes/getusersubscode", {
+            email: email,
+            code: code
+        });
+
+        // Return the server response directly
+        return response.data;
+    } catch (err) {
+        // Handle the error and return the server's response message if available
+        if (err.response) {
+            // Log the full error for debugging
+            // console.log("Error response:", err.response);
+            // console.log("Server message:", err.response.data.message);
+
+            // Return the error data from the server, e.g., { result: "error", message: "No redeem code found" }
+            return err.response.data;
+        } else {
+            console.log("Unexpected error: ", err);
+            throw err;  // Throw the error if it's unexpected (not related to the server response)
+        }
+    }
+};
+
+
 
 export const redeemValidityProductCount = async (item_id, validity) => {
     try {

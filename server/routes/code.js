@@ -8,4 +8,5 @@ codeRouter.get('/fetch-all', codeController.fetchAllCodes);
 codeRouter.post('/delete-code', codeController.deleteCode);
 codeRouter.post('/update-code', codeController.updateCode);
 codeRouter.post("/getusersubscription", codeController.getUserSubscription);
+codeRouter.post("/getusersubscode", codeController.getUserSubscode);
 module.exports = codeRouter;

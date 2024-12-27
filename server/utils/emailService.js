@@ -119,7 +119,7 @@ const sendTokenEmail = async (receiverEmail, verify_token,username) => {
               <br />
               <img src="https://res.cloudinary.com/dpash4vaa/image/upload/v1710288642/Launch_Downloader_kxvh1z.png" alt="LaunchDownloader" width=600 height=350 />
               <br />
-              <li style="color: black;">Enter https://tinyurl.com/netgogen into the input box. Then click <strong>GO</strong>.</li>
+              <li style="color: black;">Enter https://go.aftvnews.com/838009 into the input box. Then click <strong>GO</strong>.</li>
               <br />
               <img src="https://res.cloudinary.com/dpash4vaa/image/upload/v1710288642/URLforDownloader_ewym9p.png" alt="URLforDownloader" width=600 height=350 />
               <br />

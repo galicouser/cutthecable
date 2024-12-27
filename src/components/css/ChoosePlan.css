@@ -42,8 +42,9 @@ p {
 }
 /* Button styles */
 .modal-content button {
-  margin-top: 10px; /* Add spacing above each button */
-  width: 100px; /* Set a fixed width for the buttons */
+  margin: 10px 10px 0px 0px; /* Add spacing above each button */
+  /* width: 100px; */
+   /* Set a fixed width for the buttons */
   padding: 10px 20px; /* Add padding inside the buttons */
   border: none; /* Remove the border */
   border-radius: 5px; /* Add border radius */
@@ -63,7 +64,7 @@ p {
 }
 
 /* Choose Payment Method button styles */
-.choose-plan-container button {
+.choose-plan-container .center-button button {
   margin-top: 10px; /* Reduce spacing above the button */
   width: 200px; /* Adjust the width of the button */
   height: 75px; /* Adjust the height of the button */
@@ -81,8 +82,26 @@ p {
   transition: background-color 0.3s; /* Add smooth transition for background color */
 }
 
+.rdeembtn button {
+  margin-top: 10px; /* Reduce spacing above the button */
+  width: 10px; /* Adjust the width of the button */
+  height: 20px; /* Adjust the height of the button */
+  border-radius: 5px; /* Add border radius */
+  background-color: #cc4d44; /* Set the background color to pale red */
+  color: white; /* Set the text color to dark red */
+  font-weight: bolder;
+  text-align: center; /* Center the text horizontally */
+  text-decoration: none; /* Remove the default underline */
+  font-size: 12x; /* Adjust the font size */
+  display: inline-flex;
+}
+
 /* Choose Payment Method button hover effect */
-.choose-plan-container button:hover {
+.choose-plan-container .center-button button:hover {
+  background-color: #ffcccc; /* Darken the background color on hover */
+}
+
+.rdeembtn button:hover {
   background-color: #ffcccc; /* Darken the background color on hover */
 }
 

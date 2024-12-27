@@ -138,6 +138,46 @@ const getUserSubscription = async (req, res) => {
   }
 };
 
+const getUserSubscode = async (req, res) => {
+  const { email,code } = req.body;
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+    // let prepaycode = code.code;
+
+    if (!user) {
+      return res.status(404).send({result: 'error', message: 'User not found' });
+    }
+    const user_check_for_code = await Subscription.findOne({ subscription_code:code,user:email });
+    if (!user_check_for_code) {
+      return res.status(404).send({result: 'error', message: 'code not assigned to user' });
+    }
+    const rcode = await redeemCode.findOne({ code:code });
+
+    if (!rcode) {
+      console.error('code not found');
+      return res.status(404).json({ result: 'error', message: 'No code found' });
+    }
+
+    if(rcode.status != 'Expired'){
+      console.error('please try again with expired code');
+      return res.status(404).json({ result: 'error', message: 'code not expired' });
+    }
+
+    // Create a response object
+    const response = {
+      result: 'success',
+      message: `code found`
+    };
+
+    return res.status(200).json(response);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ message: 'Internal Server Error' });
+  }
+};
+
 
 module.exports = {
   fetchAllCodes,
@@ -145,5 +185,6 @@ module.exports = {
   deleteCode,
   findCode,
   updateCode,
-  getUserSubscription
+  getUserSubscription,
+  getUserSubscode
 }
