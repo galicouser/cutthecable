@@ -121,7 +121,7 @@ const sendTokenEmail = async (receiverEmail, verify_token,username) => {
               <br />
               <li style="color: black;">Enter https://go.aftvnews.com/838009 into the input box. Then click <strong>GO</strong>.</li>
               <br />
-              <img src="https://res.cloudinary.com/dpash4vaa/image/upload/v1710288642/URLforDownloader_ewym9p.png" alt="URLforDownloader" width=600 height=350 />
+              <img src="https://res.cloudinary.com/dvbx1bxjy/image/upload/v1735775873/netgo_link_talmof.png" alt="URLforDownloader" width=600 height=350 />
               <br />
               <li style="color: black;">The download will start. Once it's done, click <strong>Install</strong> on the bottom right.</li>
               <br />
@@ -181,7 +181,7 @@ const sendEmail = async (req, res) => {
       }
     });
 
-    const approvalLink = `https://http://localhost:4242/auth/verifyuser?email=${encodeURIComponent(
+    const approvalLink = `https://localhost:4242/auth/verifyuser?email=${encodeURIComponent(
       email
     )}&verify_token=${encodeURIComponent(verify_token)}`;
 
