@@ -5,8 +5,8 @@ import { FETCH_SUBSCRIPTION_PLANS, SELECT_SUBSCRIPTION_PLAN } from './types';
 const axiosAPI = axios.create({
   //baseURL: "https://nocableneeded-auth.onrender.com/",
   // baseURL: "https://1738api.nocableneeded.net/",
-  baseURL: "http://localhost:4242",
-  // baseURL: "https://1738api.cutthecable.org",
+  // baseURL: "http://localhost:4242",
+  baseURL: "https://1738api.cut-the-cable.tv",
   // baseURL: "https://ctc-test-be.netlify.app"
 });
 

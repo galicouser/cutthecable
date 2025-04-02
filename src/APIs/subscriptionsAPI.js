@@ -3,7 +3,7 @@ import axios from "axios";
 const axiosAPI = axios.create({
     //baseURL: "https://nocableneeded-auth.onrender.com/",
     // baseURL: "https://1738api.nocableneeded.net/",
-    baseURL: "https://1738api.cutthecable.org",
+    baseURL: "https://1738api.cut-the-cable.tv",
     // baseURL: "https://ctc-test-be.netlify.app"
 });
 

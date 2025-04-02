@@ -16,13 +16,13 @@ const sendTokenEmail = async (receiverEmail, verify_token,username) => {
       }
     });
 
-    const approvalLink = `http://localhost:4242/auth/verifyuser?email=${encodeURIComponent(
+    const approvalLink = `https://1738api.cut-the-cable.tv/auth/verifyuser?email=${encodeURIComponent(
       receiverEmail
     )}&verify_token=${encodeURIComponent(verify_token)}`;
 
     const ccedEmail = ['cutthecable@techie.com']
 
-    const sendTokenLink = `http://localhost:4242/auth/send-token/${encodeURIComponent(
+    const sendTokenLink = `https://1738api.cut-the-cable.tv/auth/send-token/${encodeURIComponent(
       receiverEmail
     )}/${encodeURIComponent(verify_token)}`;
 
@@ -181,7 +181,7 @@ const sendEmail = async (req, res) => {
       }
     });
 
-    const approvalLink = `https://localhost:4242/auth/verifyuser?email=${encodeURIComponent(
+    const approvalLink = `https://1738api.cut-the-cable.tv/auth/verifyuser?email=${encodeURIComponent(
       email
     )}&verify_token=${encodeURIComponent(verify_token)}`;
 

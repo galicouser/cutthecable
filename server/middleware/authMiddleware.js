@@ -62,7 +62,7 @@ const verifyUserApproval = async (req, res) => {
     try {
       await user.save();
       console.log("User verified!");
-      res.redirect("https://cutthecable.org/");
+      res.redirect("https://www.cut-the-cable.tv/");
     } catch (error) {
       console.log("user not verified : ", error);
       return res.status(400).send({ message: "User not verified!" });
