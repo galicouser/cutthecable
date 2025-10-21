@@ -236,10 +236,10 @@ opacity: 0.5;
 position: absolute;
 }
 @media (max-width: 767px) {
-  display: grid;
+  /* display: grid;
   justify-content: center;
   place-content: center;
-  align-items: center;
+  align-items: center; */
 
 .noData{
   margin-top: 20%;

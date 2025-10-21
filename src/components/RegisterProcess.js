@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
 import CloseIcon from "@mui/icons-material/Close";
-import SignInGeneralDeatils from "./SignInGeneralDetails";
+// import SignInGeneralDeatils from "./SignInGeneralDetails";
+import SignUpDetails from "./SignUpDetails";
 import EmailNotification from "./EmailNotification";
 
 const RegisterProcess = ({ updateParentValue }) => {
@@ -22,6 +23,7 @@ const RegisterProcess = ({ updateParentValue }) => {
     if (selectedFunction === "functionOne") {
       GeneralMarkedDone();
     } else if (selectedFunction === "functionTwo") {
+      updateParentValue(false);
     }
   };
 
@@ -46,7 +48,7 @@ const RegisterProcess = ({ updateParentValue }) => {
                 <p className="SignInTitle">Start your journey here!</p>
 
                 {GeneralDone && (
-                  <SignInGeneralDeatils
+                  <SignUpDetails
                     updateSubParentValue={updateSubParentValue}
                   />
                 )}

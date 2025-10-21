@@ -2,25 +2,29 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const mongoose = require('mongoose');
-
-
+const { OAuth2Client } = require("google-auth-library");
 const User = require("../models/user");
 
 // Comment out the validation imports if you want to remove validation temporarily
-const {
-  validateUser,
-  validateLogin,
-  validateEmail,
-  validateResetPasswordCredentials,
-} = require("../middleware/validation");
+// const {
+//   validateUser,
+//   validateLogin,
+//   validateEmail,
+//   validateResetPasswordCredentials,
+// } = require("../middleware/validation");
 const { sendTokenEmail, resetPasswordEmail, sendEmail } = require("../utils/emailService");
 
+const client = new OAuth2Client(process.env.OAUTH_CLIENT_ID);
+
 exports.signupUser = async (req, res) => {
-  const { error } = validateUser(req.body);
-
-  if (error) return res.status(400).send({ message: "Enter data correctly" });
-
   const { email, password, userName, profile_picture } = req.body;
+
+  const formatEmail = email.trim().toLowerCase();
+
+  const existingEmail = await User.findOne({ email: email });
+  if (existingEmail) {
+    return res.status(409).send({ message: "Email already in use" });
+  }
 
   const user = await User.findOne({ email: email });
   const username = await User.findOne({ userName: userName });
@@ -32,8 +36,12 @@ exports.signupUser = async (req, res) => {
   if (user) return res.status(404).send({ message: "User already exists" });
   if (username) return res.status(404).send({ message: "Username taken" });
 
+  console.log(userName)
+
   const salt = await bcrypt.genSalt(12);
   const hashedPassword = await bcrypt.hash(password, salt);
+
+  console.log(hashedPassword)
 
   const verificationToken = crypto.randomBytes(20).toString("hex");
   let newUser = new User({
@@ -41,11 +49,13 @@ exports.signupUser = async (req, res) => {
     password: hashedPassword,
     userName: userName,
     verificationToken: verificationToken,
-    profile_picture: profile_picture
+    profile_picture: profile_picture,
+    isVerified: false,
   });
+
   try {
     const savedUser = await newUser.save();
-    await sendTokenEmail(email, verificationToken,userName);
+    await sendTokenEmail(email, verificationToken, userName);
     console.log("User saved");
     return res.status(200).send({ message: "User saved!" });
   } catch (err) {
@@ -54,15 +64,32 @@ exports.signupUser = async (req, res) => {
   }
 };
 
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ message: "Not logged in" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select("-password");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ message: "Invalid token" });
+  }
+}
+
 
 exports.FetchUsers = async (req, res) => {
   try {
     // Exclude users with email "admin@galico.io" from the query
-    const users = await User.find({ 
-      email: { $ne: "admin@galico.io" }, 
-      deleted: false 
+    const users = await User.find({
+      email: { $ne: "admin@galico.io" },
+      deleted: false
     });
-    
+
 
     if (users.length === 0) {
       return res.status(200).send({ message: 'No entries found' });
@@ -127,45 +154,42 @@ exports.UpdateUsers = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
-  const { error } = validateLogin(req.body);
-
-  if (error)
-    return res
-      .status(400)
-      .send({ message: "Error. Enter data in correct form" });
 
   const { userName, password } = req.body;
 
-  let user = await User.findOne({
-    userName: userName,
-    deleted: { $in: [false, null] },
-    isVerified: true,
-  });
-  
-  console.log(user)
-  if (!user) return res.status(404).send({ message: "Account not found" });
-  console.log(user)
-// remove user.email !== line !!!!!!!
-  const hashedPassword = await bcrypt.compare(password, user.password);
-  if (!hashedPassword && user.email !== 'ambeebaby@gmail.com' && user.userName !== 'ampd12') {
-    console.log('poo')
-    return res.status(404).send({ message: "Invalid email or password" });
-  }
+  try {
+    let user = await User.findOne({
+      userName: userName,
+      isVerified: true,
+    });
 
-  const token = jwt.sign({ userId: user._id.toString() }, "userToken");
-  if (!token)
-    res.status(400).json({
-      message: "Token is empty",
-      data: token,
+    if (!user) return res.status(404).send({ message: "Account not found" });
+
+    const hashedPassword = await bcrypt.compare(password, user.password);
+    console.log(password)
+    if (!hashedPassword) {
+      return res.status(404).send({ message: "Invalid email or password" });
+    }
+    const appToken = createAppToken(user._id).token;
+
+    res.cookie("token", appToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-  else {
-    return res.status(200).json({
-      token: token,
-      userName: user.userName,
-      email: user.email,
-      verified: user.isVerified,
-      profile_picture: user.profile_picture
+
+    res.json({
+      user: {
+        userName: user.userName,
+        email: user.email,
+        profile_picture: user.profile_picture,
+      },
+      isNewUser: false,
     });
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ message: "Login failed" });
   }
 };
 
@@ -251,6 +275,32 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+exports.verifyUser = async (req, res) => {
+  try {
+    const token = req.query.token;
+
+    if (!token) {
+      return res.status(400).json({ message: 'Verification token is missing.' })
+    }
+
+    const user = await User.findOne({ verificationToken: token });
+
+    if (!user) {
+      return res.redirect('http://localhost:4242/verification-failed?from=verification');
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+
+    await user.save();
+
+    return res.redirect('http://localhost:4242/verification-success?from=verification');
+  } catch (error) {
+    console.error('Verification error:', error);
+    return res.redirect('http://localhost:4242/verification-failed?from=verification');
+  }
+}
+
 // exports.fetchAllUsers = async (req, res) => {
 //   try {
 //     // Exclude users with email "admin@galico.io" from the query
@@ -266,3 +316,93 @@ exports.resetPassword = async (req, res) => {
 //     return res.status(500).send({ message: 'Internal Server Error' });
 //   }
 // }
+
+exports.googleAuth = async (req, res) => {
+  try {
+    let isNewUser = false;
+
+    const { token } = req.body;
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    const { email, name, picture, sub: googleId } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      isNewUser = true;
+
+      let baseUsername = name.replace(/\s+/g, "").toLowerCase();
+      let finalUsername = baseUsername;
+      let counter = 1;
+
+      while (await User.findOne({ username: finalUsername })) {
+        finalUsername = `${baseUsername}${counter}`;
+        counter++;
+      }
+
+      const verificationToken = crypto.randomBytes(20).toString("hex");
+
+      user = new User({
+        email,
+        googleId,
+        userName: finalUsername,
+        profile_picture: picture,
+        verificationToken,
+        isVerified: false,
+        password: null,
+      });
+
+      await user.save();
+      await sendTokenEmail(user.email, user.verificationToken, user.userName);
+    } else if (!user.googleId) {
+      user.googleId = googleId;
+      await user.save();
+    }
+
+    const appToken = createAppToken(user._id).token;
+
+    res.cookie("token", appToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({
+      user: {
+        userName: user.userName,
+        email: user.email,
+        profile_picture: user.profile_picture,
+      },
+      isNewUser,
+    });
+
+
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ message: "Google auth failed" });
+  }
+};
+
+exports.logoutUser = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  res.json({ message: "Logged out successfully" });
+};
+
+const createAppToken = (userId) => ({
+  token: jwt.sign(
+    { userId },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+)});

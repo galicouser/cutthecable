@@ -10,12 +10,11 @@ import RedeemCode from "../components/RedeemCode";
 import UpdateProfile from "../components/UpdateProfile";
 import { useNavigate } from "react-router-dom";
 
-const UserProfile = () => {
+const UserProfile = ({ user }) => {
   const [CurrentScreen, setCurrentScreen] = useState(3);
   const [SignInPrompt, setSignInPrompt] = useState(true);
   const [ReferralOverlay, setReferralOverlay] = useState();
-  const isVerified = localStorage.getItem("isVerified");
-  const signedInUser = localStorage.getItem("Username");
+  const isVerified = user?.isVerified;
   const navigate = useNavigate();
 
   const handleValueUpdate = (newValue) => {
@@ -34,7 +33,7 @@ const UserProfile = () => {
   },[isVerified])
 
   useEffect(() => {
-    if (signedInUser === null) {
+    if (user === null) {
       navigate('/');
     }
   }, []);
@@ -66,7 +65,7 @@ const UserProfile = () => {
     <Wrapper>
       <Header isLoggedIn={true} />
 
-      { isVerified === 'true' &&
+      { isVerified &&
         <div className="FlexRowDiv">
           <SideBar updateParentValue={handleValueUpdate} />
           {ScreenDisplay()}

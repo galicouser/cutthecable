@@ -1,6 +1,9 @@
 const nodemailer = require("nodemailer");
+require('dotenv').config();
 
-const sendTokenEmail = async (receiverEmail, verify_token,username) => {
+const { APP_ENV } = process.env;
+
+const sendTokenEmail = async (receiverEmail, token, username) => {
   return new Promise((resolve, reject) => {
     const transporter = nodemailer.createTransport({
       host: "smtp.mail.com", // Replace with the SMTP server for Mail.com
@@ -16,15 +19,15 @@ const sendTokenEmail = async (receiverEmail, verify_token,username) => {
       }
     });
 
-    const approvalLink = `https://1738api.cut-the-cable.tv/auth/verifyuser?email=${encodeURIComponent(
+    const approvalLink = `http://localhost:4242/auth/verify-user?email=${encodeURIComponent(
       receiverEmail
-    )}&verify_token=${encodeURIComponent(verify_token)}`;
+    )}&token=${encodeURIComponent(token)}`;
 
-    const ccedEmail = ['cutthecable@techie.com']
+    const ccedEmail = APP_ENV === 'live' ? ['cutthecable@techie.com'] : ['ambermorris1997@gmail.com'];
 
-    const sendTokenLink = `https://1738api.cut-the-cable.tv/auth/send-token/${encodeURIComponent(
+    const sendTokenLink = `http://localhost:4242/auth/send-token/${encodeURIComponent(
       receiverEmail
-    )}/${encodeURIComponent(verify_token)}`;
+    )}/${encodeURIComponent(token)}`;
 
 
     const mail_config = {

@@ -7,13 +7,17 @@ import LogoDesign from "./NoCableNeededLogo.png";
 import RegisterProcess from "./RegisterProcess";
 import Button from "@mui/material/Button";
 import PersonIcon from '@mui/icons-material/Person';
+import { useDispatch } from "react-redux";
+import { clearUser } from "./store/authSlice";
+import { logOut } from "../APIs/authAPI";
 
-function Header({ isLoggedIn }) {
+function Header({ user }) {
   const [navbar, setnavbar] = useState(false);
-  const signedInUser = localStorage.getItem("Username");
-  const signedInUserType = localStorage.getItem("UserType");
   const [UserOptionClicked, setUserOptionClicked] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const signedInUserType = user?.username === "admin" ? "admin" : "user";
 
   const handleScroll = () => {
     const scrollY = window.scrollY;
@@ -47,6 +51,12 @@ function Header({ isLoggedIn }) {
     setUserOptionClicked(!UserOptionClicked);
   }
 
+  const handleLogout = async () => {
+    UserClicked();
+    dispatch(clearUser());
+    const res = await logOut();
+    navigate("/");
+  }
 
 
   return (
@@ -73,7 +83,7 @@ function Header({ isLoggedIn }) {
             </div>
           </div>
 
-          {signedInUser == null && (
+          {user == null && (
             <>
               <Button
                 variant="text"
@@ -85,7 +95,7 @@ function Header({ isLoggedIn }) {
             </>
           )}
 
-          {signedInUser != null &&
+          {user != null &&
             <div className="UserDisplay" onClick={UserClicked}>
               <PersonIcon className="UserImage" />
             </div>
@@ -132,22 +142,18 @@ function Header({ isLoggedIn }) {
             >My Account</p>
             <p
               className="MenuItem2"
-              onClick={() => {
-                localStorage.removeItem('Username');
-                setUserOptionClicked(false);
-                navigate("/");
-              }}
+              onClick={handleLogout}
             >Log Out</p>
           </motion.div>
 
         }
       </AnimatePresence>
       {/* Facebook Messenger Chat Plugin */}
-      {/* <div class="fb-messengermessageus" 
-        messenger_app_id="<APP_ID>" 
+      {/* <div class="fb-messengermessageus"
+        messenger_app_id="<APP_ID>"
         page_id="<PAGE_ID>"
         color="<blue | white>"
-        ref="<PASS_THROUGH_PARAM>" 
+        ref="<PASS_THROUGH_PARAM>"
         size="<standard | large | xlarge>">
       </div> */}
     </Wrapper>
@@ -164,7 +170,7 @@ const Wrapper = styled.section`
     align-items: center;
     justify-content: space-between;
     background-color: #f9f9f9;
-    
+
     transition: opacity 0.3s ease, border-radius 0.3s ease, background-color 0.3s ease;
   }
   .wrapperActive {
@@ -355,7 +361,7 @@ const Wrapper = styled.section`
     -moz-box-shadow: 10px 10px 23px -5px rgba(0,0,0,0.65);
     box-shadow: 10px 10px 23px -5px rgba(0,0,0,0.65);
   }
-  
+
   .MenuItem2{
       font-size:18px;
       text-decoration:underline;
@@ -363,7 +369,7 @@ const Wrapper = styled.section`
       text-decoration-color: red;
     }
   .MenuItem{
-    
+
     font-size:18px;
     text-decoration:underline;
     text-decoration-thickness: 4px;
@@ -395,7 +401,7 @@ const Wrapper = styled.section`
     }
     .ButtonHolder{
       margin-right:50%;
-      
+
     }
     .ButtonHolder:hover{
       background-color: transparent;

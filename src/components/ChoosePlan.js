@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSubscriptionPackage, selectSubscriptionPlan, setSubscriptionLength, setNumberDevices } from './actions/subscriptionActions';
+// import { fetchSubscriptionPackage, selectSubscriptionPlan, setSubscriptionLength, setNumberDevices } from './actions/subscriptionActions';
+import { fetchSubscriptionPackage } from "./store/subscriptionSlice"
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Select from "@mui/material/Select";
@@ -24,8 +25,9 @@ import './css/ChoosePlan.css';
 
 const ChoosePlan = () => {
   const dispatch = useDispatch();
-  const subscriptionPackages = useSelector(state => state.subscription.plans);
-  const selectedPackage = useSelector(state => state.subscription.selectedPlan);
+  // const subscriptionPackages = useSelector(state => state.subscriptions.plans);
+  // const selectedPackage = useSelector(state => state.subscriptions.selectedPlan);
+  const selectedPackage = [];
   const [data, setData] = useState([]);
   const [noData, setNoData] = useState(true);
   const [activeSubscription, setActiveSubscription] = useState(null);
@@ -34,8 +36,10 @@ const ChoosePlan = () => {
   const [SignUpOverlay, setSignUpOverlay] = useState(false);
   const [updatedData, setUpdatedData] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState(null);
-  const subscriptionLength = useSelector(state => state.subscription.subscriptionLength)
-  const numberDevices = useSelector(state => state.subscription.numberDevices);
+  // const subscriptionLength = useSelector(state => state.subscription.subscriptionLength)
+  // const numberDevices = useSelector(state => state.subscription.numberDevices);
+  const subscriptionLength = 1;
+  const numberDevices = 1;
   const [openModal, setOpenModal] = useState(false);
   const [dataToSend, setDataToSend] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,6 +56,9 @@ const ChoosePlan = () => {
   const email = localStorage.getItem("Email");
   useEffect(() => {
     const fetchData = async () => {
+      // try {
+      //   // fetch first subscription package
+      // }
       try {
         const responseData = await userSubscriptionCodes(email);
         const formattedData = responseData.data.data.map((row, index) => ({
@@ -80,7 +87,7 @@ const ChoosePlan = () => {
 
     fetchData();
   }, [updatedData]);
-  
+
   useEffect(() => {
     dispatch(fetchSubscriptionPackage());
   }, []);
@@ -136,7 +143,7 @@ const ChoosePlan = () => {
       alert('Please enter your renewal code.');
       return;
     }
-  
+
     // Check code validity
     // const { validity } = await getUserSubCode(email, renewalCode);
     // console.log(validity);
@@ -155,10 +162,10 @@ const ChoosePlan = () => {
         alert("something went wrong");
         console.log("No validity information found.");
     }
-    
+
 };
-  
-  
+
+
 
   const handleBackStep = () => {
     console.log(typeof activeStep);
@@ -171,7 +178,7 @@ const ChoosePlan = () => {
     else{
       setActiveStep((prevActiveStep) => prevActiveStep - 1);
     }
-    
+
   };
 
   const handlePaymentMethodSelect = async (method) => {
@@ -211,7 +218,8 @@ const ChoosePlan = () => {
   };
 
   // Filter out duplicate durations
-  const uniqueDurations = Array.from(new Set(subscriptionPackages.map(subscriptionPackage => subscriptionPackage.duration)));
+  // const uniqueDurations = Array.from(new Set(subscriptionPackages.map(subscriptionPackage => subscriptionPackage.duration)));
+  const uniqueDurations = [];
 
   const columns = [
     { field: "id", headerName: "ID", width: 150 },

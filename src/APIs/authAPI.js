@@ -1,12 +1,12 @@
 import axios from "axios";
 
-const axiosAPI = axios.create({
-    //baseURL: "https://nocableneeded-auth.onrender.com/",
-    // baseURL: "https://1738api.nocableneeded.net/",
-    // baseURL: "http://localhost:4242",
-    baseURL: "https://1738api.cut-the-cable.tv",
-    // baseURL: "https://ctc-test-be.netlify.app"
-});
+// const axiosAPI = axios.create({
+//     //baseURL: "https://nocableneeded-auth.onrender.com/",
+//     // baseURL: "https://1738api.nocableneeded.net/",
+//     baseURL: "http://localhost:4242",
+//     // baseURL: "https://1738api.cut-the-cable.tv",
+//     // baseURL: "https://ctc-test-be.netlify.app"
+// });
 
 export const signupUser = async (email, password, username, profile_picture) => {
     try {
@@ -143,4 +143,29 @@ export const addRedeemCode = async (email, code) => {
         });
 
     return response;
+};
+
+export const googleAuth = async (credentials) => {
+    try {
+        const response = await axios.post("/auth/google", {
+          token: credentials.credential
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Google auth failed:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const logOut = async () => {
+    try {
+        const response = await axios.post("/auth/logout", {}, {
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Logout failed:", error);
+        throw error;
+    }
 };

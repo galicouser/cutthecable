@@ -4,11 +4,13 @@ const axios = require('axios');
 const mongoose = require("mongoose");
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require("cors");
 require('dotenv').config();
-const username = process.env.DB_USER_NAME;
-const password = process.env.DB_USER_PASS;
-const db_endpoint = process.env.DB_ENDPOINT;
+const { APP_ENV } = process.env;
+const username = APP_ENV === 'live' ? process.env.DB_USER_NAME : process.env.DB_USER_NAME_TEST;
+const password = APP_ENV === 'live' ? process.env.DB_USER_PASS : process.env.DB_USER_PASS_TEST;
+const db_endpoint = APP_ENV === 'live' ? process.env.DB_ENDPOINT : process.env.DB_ENDPOINT_TEST;
 const auth = require("./routes/auth");
 const checkoutRouter = require("./routes/checkout");
 const subscriptionPackage = require("./routes/subscriptionPackage");
@@ -18,8 +20,8 @@ const { updateCode,updateUserSub, createPurchase, capturePaypalOrder } = require
 
 const { sendSubscriptionCodes } = require('./utils/emailService');
 
-const uri = `mongodb+srv://${username}:${password}@${db_endpoint}/?retryWrites=true&w=majority`;
-// const uri = `mongodb+srv://${username}:${password}@cutthecable-prod.r3qdzla.mongodb.net/?retryWrites=true&w=majority&appName=CutTheCable-Prod`
+// const uri = `mongodb+srv://${username}:${password}@${db_endpoint}/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${username}:${password}@cutthecable-prod.r3qdzla.mongodb.net/?retryWrites=true&w=majority&appName=CutTheCable-Prod`
 const paths = [
   '/',
   '/UserProfile',
@@ -52,6 +54,7 @@ paths.forEach((route) => {
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.use("/auth", auth);
 app.use("/checkout", checkoutRouter);
@@ -71,7 +74,7 @@ mongoose
 
   app.get('/payment-confirmation', async (req, res) => {
     const { pg, subscription, user, email, con, duration, price, token, payerID } = req.query;
-  
+
     try {
       switch (pg) {
         case 'paypal':
@@ -80,12 +83,12 @@ mongoose
             const captureResponse = await capturePaypalOrder(token);
             if (captureResponse.statusCode === 200) {
               console.log('Payment captured successfully:', captureResponse.result);
-      
+
               // Perform actions after successful payment capture
               createPurchase(user, duration, con, price, payerID);
               updateUserSub(user, subscription, duration);
               const codes = await findCode(duration, con);
-      
+
               if (codes.length <= 0) {
                 // TODO: Notify user and admin about missing codes
                 sendSubscriptionCodes(null, email);
@@ -95,9 +98,9 @@ mongoose
                 for (const codeId of codes.map(code => code._id)) {
                   await updateCode(codeId, user);
                 }
-      
+
                 await sendSubscriptionCodes(codes, email, duration);
-      
+
                 return res.sendFile(path.join(__dirname, 'confirmationPage.html'));
               }
             } else {
@@ -110,13 +113,13 @@ mongoose
             return res.sendFile(path.join(__dirname, 'orderFailed.html'));
           }
           break;
-  
+
         case 'stripe':
           try {
               createPurchase(user, duration, con, price, payerID);
               updateUserSub(user, subscription, duration);
               const codes = await findCode(duration, con);
-       
+
               if (codes.length <= 0) {
                 // TODO: Notify user and admin about missing codes
                 sendSubscriptionCodes(null, email);
@@ -127,7 +130,7 @@ mongoose
                   await updateCode(codeId, user);
                 }
                 await sendSubscriptionCodes(codes, email, duration);
-      
+
                 return res.sendFile(path.join(__dirname, 'confirmationPage.html'));
               }
           } catch (error) {
@@ -136,7 +139,7 @@ mongoose
             return res.sendFile(path.join(__dirname, 'orderFailed.html'));
           }
           break;
-  
+
         default:
           console.error('Unsupported payment gateway:', pg);
           return res.status(400).send('Unsupported payment gateway');
@@ -146,5 +149,9 @@ mongoose
       return res.sendFile(path.join(__dirname, 'orderFailed.html'));
     }
   });
+
+  app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public', '../public/index.html'));
+});
 
 module.exports = app;

@@ -27,14 +27,11 @@ import LiveLogoImage from "./LiveLogoImage.png";
 
 
 
-function Hero() {
+function Hero({ user }) {
   const navigate = useNavigate();
   const [SignUpOverlay, setSignUpOverlay] = useState(false);
   const [LoginDone, setLoginDone] = useState(false);
   const signedInUser = localStorage.getItem("Username");
-
-
-
 
   function LoginClicked() {
     setLoginDone(!LoginDone);
@@ -42,7 +39,7 @@ function Hero() {
 
   const updateSignInParentValue = (selectedFunction) => {
     if (selectedFunction === "functionOne") {
-      navigate("/UserProfile");
+      navigate("/");
     }
     else if (selectedFunction === "functionThree") {
       navigate("/AdminPortal");
@@ -86,7 +83,7 @@ function Hero() {
     <Wrapper>
       {SignUpOverlay && <RegisterProcess updateParentValue={SignUpClicked} />}
 
-      <Header />
+      <Header user={user} />
       <Grid item container gap={2} className="balck">
         {LoginDone && (
           <SignIn updateSignInParentValue={updateSignInParentValue} />
@@ -116,7 +113,7 @@ function Hero() {
                 </div>
               </Grid>
             </div>
-            {signedInUser == null &&
+            {user == null &&
               <div className="SubTitleHolder">
                 <Grid item sm={8}>
                   <div className="MainGriddiv">
@@ -569,7 +566,7 @@ function Hero() {
                     and Discover Endless Fun!
                   </p>
 
-                  {signedInUser == null &&
+                  {user == null &&
                     <Button
                       variant="contained"
                       onClick={SignUpClicked}
@@ -608,7 +605,7 @@ const Wrapper = styled.section`
   height:100%;
   width:100%;
  }
- 
+
 
   .SportsTitleHolder {
     display: flex;
@@ -796,7 +793,7 @@ const Wrapper = styled.section`
     padding-left: 10%;
     width: 100%;
     height: 100hv;
-    
+
   }
   .ImageBlockHolderSports {
     margin-top: 6%;
@@ -1071,7 +1068,7 @@ const Wrapper = styled.section`
 
     .liveStreamText{
       font-size:25px;
-      
+
     }
 
     .SubSectionSubTitle {
@@ -1094,7 +1091,7 @@ const Wrapper = styled.section`
       height:50%;
       width:50%;
      }
-     
+
     .SavingSubTitle {
       text-align: center;
     }

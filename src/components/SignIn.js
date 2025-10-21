@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
+import { setUser } from "./store/authSlice";
 import CloseIcon from "@mui/icons-material/Close";
 import PersonIcon from "@mui/icons-material/Person";
 import HttpsIcon from "@mui/icons-material/Https";
@@ -16,6 +17,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { loginUser } from "../APIs/authAPI";
 
 const SignIn = ({ updateSignInParentValue }) => {
@@ -34,6 +36,7 @@ const SignIn = ({ updateSignInParentValue }) => {
     settoggleValue(!toggleValue);
   }
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   async function SignUpClicked() {
@@ -51,14 +54,11 @@ const SignIn = ({ updateSignInParentValue }) => {
       try {
         setSignInAwait(true);
         const user = await loginUser(UserName, Password);
-        console.log(user)
         setErrorMessage("");
         setSignInAwait(false);
         if (user) {
-          localStorage.setItem("Username", user.userName);
-          localStorage.setItem("Email", user.email);
-          localStorage.setItem("isVerified", user.verified);
-          localStorage.setItem("ProfilePicture", user.profile_picture);
+          dispatch(setUser(user));
+
         } else {
           localStorage.setItem("Username", null);
           localStorage.setItem("Email", null);
